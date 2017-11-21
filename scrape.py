@@ -14,6 +14,9 @@ import json
 
 def _scrape(arr):
   companyid, proxy = arr
+  if os.path.exists('controlflags/{}-finished'.format(companyid))  or \
+    os.path.exists('controlflags/{}-exception'.format(companyid)):
+    return
   try:
     data = {}
     # fundamentals 
@@ -74,7 +77,9 @@ def _scrape(arr):
       camp_name = camp_name.replace('(株)', '')
       print( camp_name )
       open('data/{}_{}.json'.format(camp_name, companyid), 'w').write( json.dumps(data, indent=2, ensure_ascii=False) ) 
+    open('controlflags/{}-finished'.format(companyid), 'w') 
   except Exception as e:
+    open('controlflags/{}-exception'.format(companyid), 'w') 
     print('Deep', e)
 import random
 proxies = []
