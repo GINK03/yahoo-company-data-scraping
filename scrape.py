@@ -12,13 +12,14 @@ import re
 import json
 
 
-def _scrape(companyid):
+def _scrape(arr):
+  companyid, proxy = arr
   try:
     data = {}
     # fundamentals 
     data['fundamentals'] = {}
     url = 'https://profile.yahoo.co.jp/fundamental/?s={}'.format(companyid)
-    r = requests.get(url)
+    r = requests.get(url, proxies=proxy)
     soup = bs4.BeautifulSoup( r.text )
     for tr in soup.find_all('tr', {'class':'yjMt'}):
       tds = tr.find_all('td')
@@ -75,10 +76,15 @@ def _scrape(companyid):
       open('data/{}_{}.json'.format(camp_name, companyid), 'w').write( json.dumps(data, indent=2, ensure_ascii=False) ) 
   except Exception as e:
     print('Deep', e)
-
-iis = [i for i in range(2222, 1000000)]
-
+import random
+proxies = []
+for line in open('aws_ips.txt'):
+  line = line.strip()
+  spot, ip = line.split()
+  proxies.append( {'http':'{}:8080'.format(ip), 'https':'{}:8080'.format(ip) } ) 
+arrs = [(i,random.choice(proxies)) for i in range(2222, 1000000)]
+random.shuffle(arrs)
 #[ _scrape(i) for i in iis] 
 import concurrent.futures 
-with concurrent.futures.ProcessPoolExecutor(max_workers=500) as exe:
-  exe.map( _scrape, iis )
+with concurrent.futures.ProcessPoolExecutor(max_workers=50) as exe:
+  exe.map( _scrape, arrs )
