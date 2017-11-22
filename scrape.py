@@ -1,6 +1,5 @@
 import requests
 
-
 import os
 
 import sys
@@ -87,7 +86,7 @@ for line in open('aws_ips.txt'):
   line = line.strip()
   spot, ip = line.split()
   proxies.append( {'http':'{}:8080'.format(ip), 'https':'{}:8080'.format(ip) } ) 
-arrs = [(i,random.choice(proxies)) for i in range(2222, 1000000)]
+arrs = [(i,random.choice(proxies)) for i in range(1, 2222)]
 random.shuffle(arrs)
 #[ _scrape(i) for i in iis] 
 import concurrent.futures 
